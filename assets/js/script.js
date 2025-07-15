@@ -17,41 +17,43 @@ sidebarBtn.addEventListener("click", function () { elementToggleFunc(sidebar); }
 
 
 // testimonials variables
-const testimonialsItem = document.querySelectorAll("[data-testimonials-item]");
-const modalContainer = document.querySelector("[data-modal-container]");
-const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
-const overlay = document.querySelector("[data-overlay]");
+// const testimonialsItem = document.querySelectorAll("[data-testimonials-item]");
+// const modalContainer = document.querySelector("[data-modal-container]");
+// const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
+// const overlay = document.querySelector("[data-overlay]");
 
 // modal variable
-const modalImg = document.querySelector("[data-modal-img]");
-const modalTitle = document.querySelector("[data-modal-title]");
-const modalText = document.querySelector("[data-modal-text]");
+// const modalImg = document.querySelector("[data-modal-img]");
+// const modalTitle = document.querySelector("[data-modal-title]");
+// const modalText = document.querySelector("[data-modal-text]");
 
-// modal toggle function
-const testimonialsModalFunc = function () {
-  modalContainer.classList.toggle("active");
-  overlay.classList.toggle("active");
-}
+// // modal toggle function
+// const testimonialsModalFunc = function () {
+//   modalContainer.classList.toggle("active");
+//   overlay.classList.toggle("active");
+// }
 
-// add click event to all modal items
-for (let i = 0; i < testimonialsItem.length; i++) {
+// // add click event to all modal items
+// for (let i = 0; i < testimonialsItem.length; i++) {
+//
+//   testimonialsItem[i].addEventListener("click", function () {
+//
+//     modalImg.src = this.querySelector("[data-testimonials-avatar]").src;
+//     modalImg.alt = this.querySelector("[data-testimonials-avatar]").alt;
+//     modalTitle.innerHTML = this.querySelector("[data-testimonials-title]").innerHTML;
+//     modalText.innerHTML = this.querySelector("[data-testimonials-text]").innerHTML;
+//
+//     testimonialsModalFunc();
+//
+//   });
+//
+// }
 
-  testimonialsItem[i].addEventListener("click", function () {
-
-    modalImg.src = this.querySelector("[data-testimonials-avatar]").src;
-    modalImg.alt = this.querySelector("[data-testimonials-avatar]").alt;
-    modalTitle.innerHTML = this.querySelector("[data-testimonials-title]").innerHTML;
-    modalText.innerHTML = this.querySelector("[data-testimonials-text]").innerHTML;
-
-    testimonialsModalFunc();
-
-  });
-
-}
-
-// add click event to modal close button
-modalCloseBtn.addEventListener("click", testimonialsModalFunc);
-overlay.addEventListener("click", testimonialsModalFunc);
+// // add click event to modal close button
+// if (modalCloseBtn && overlay) {
+//   modalCloseBtn.addEventListener("click", testimonialsModalFunc);
+//   overlay.addEventListener("click", testimonialsModalFunc);
+// }
 
 
 
@@ -157,3 +159,120 @@ for (let i = 0; i < navigationLinks.length; i++) {
 
   });
 }
+
+// === Animated Stars Background ===
+(function() {
+  const canvas = document.getElementById('stars-bg');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  let stars = [];
+  const STAR_COUNT = 240; // doubled from 120
+  const STAR_MIN_RADIUS = 0.5;
+  const STAR_MAX_RADIUS = 1.8;
+  const STAR_MIN_SPEED = 0.02; // decreased from 0.05
+  const STAR_MAX_SPEED = 0.15; // decreased from 0.4
+
+  function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  function randomBetween(a, b) {
+    return a + Math.random() * (b - a);
+  }
+
+  function createStar() {
+    const angle = Math.random() * 2 * Math.PI;
+    const speed = randomBetween(STAR_MIN_SPEED, STAR_MAX_SPEED);
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: randomBetween(STAR_MIN_RADIUS, STAR_MAX_RADIUS),
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      alpha: randomBetween(0.6, 1)
+    };
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push(createStar());
+    }
+  }
+
+  function updateStars() {
+    for (let star of stars) {
+      star.x += star.dx;
+      star.y += star.dy;
+      // Wrap around screen
+      if (star.x < 0) star.x = width;
+      if (star.x > width) star.x = 0;
+      if (star.y < 0) star.y = height;
+      if (star.y > height) star.y = 0;
+    }
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let star of stars) {
+      ctx.globalAlpha = star.alpha;
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = '#fff';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function animate() {
+    updateStars();
+    drawStars();
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    initStars();
+  });
+
+  resizeCanvas();
+  initStars();
+  animate();
+})();
+
+// === Creative Card UI: 3D Tilt and Cursor Glow ===
+document.querySelectorAll('.service-item').forEach(card => {
+  const glow = card.querySelector('.card-glow');
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    // Set glow position
+    if (glow) {
+      glow.style.setProperty('--x', `${x}px`);
+      glow.style.setProperty('--y', `${y}px`);
+    }
+    // 3D tilt
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * 10; // max 10deg
+    const rotateY = ((x - centerX) / centerX) * -10;
+    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    if (glow) {
+      glow.style.setProperty('--x', '50%');
+      glow.style.setProperty('--y', '50%');
+    }
+  });
+});
